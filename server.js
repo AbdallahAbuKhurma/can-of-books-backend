@@ -11,6 +11,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/books', { useNewUrlParser: true, use
 
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3001;
 app.use(cors());
 
@@ -21,6 +23,43 @@ app.get('/', function (req, res) {
 
 app.get('/books', getBooksByUser);
 
+app.post('/books', addBooks);
+
+function addBooks (req, res) {
+
+  const {email, bookName, bookDisc, bookStatus} = req.body;
+  UserModel.find({ email: email }, (error, userData) => {
+    console.log(userData);
+    userData[0].books.push({
+      name: bookName,
+      description: bookDisc,
+      status: bookStatus
+    });
+    userData[0].save();
+    res.send(userData);
+  });
+}
+
+app.delete('/books/:index', deleteBooksForEmail);
+
+function deleteBooksForEmail(req, res) {
+
+  const index = Number(req.params.index);
+  console.log(req.params);
+
+  const { email } = req.query;
+  console.log(email);
+  UserModel.find({ email: email }, (err, userData) => {
+
+    const newBooksArr = userData[0].books.filter((user, idx) => {
+      return idx !== index;
+    });
+    userData[0].books = newBooksArr;
+    userData[0].save();
+
+    res.send(' Book deleted!');
+  });
+}
 
 // seedUserCollection();
 
@@ -70,7 +109,6 @@ function seedUserCollection() {
   abdallah.save();
   mariam.save();
 }
-
 
 
 function getBooksByUser(req, res) {
