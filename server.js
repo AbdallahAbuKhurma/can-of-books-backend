@@ -30,13 +30,13 @@ function addBooks(req, res) {
   const { email, bookName, bookDisc, bookStatus } = req.body;
   UserModel.find({ email: email }, (error, userData) => {
     console.log(userData);
-    userData[0].books.push({
+    userData[1].books.push({
       name: bookName,
       description: bookDisc,
       status: bookStatus
     });
-    userData[0].save();
-    res.send(userData);
+    userData[1].save();
+    res.send(userData[1].books);
   });
 }
 
@@ -122,26 +122,18 @@ function getBooksByUser(req, res) {
 app.put('/books/:index', updateBooksForUser);
 
 function updateBooksForUser(req, res) {
-  // TODO: get the index
   const index = Number(req.params.index);
-  // TODO: get the data from the body
   const { email, bookName, bookDisc, bookStatus } = req.body;
-  // TODO: find the owner
   UserModel.find({ email: email }, (err, userData) => {
     console.log(userData);
-    // TODO: replace the old cat with the new cat object
-    // Using object notation assignment
-    // ownerData[0].cats[index].name = catName;
-    // ownerData[0].cats[index].breed = catBreed;
 
-    // USING SPLICE
-    userData[0].books.splice(index, 1, {
+    userData[1].books.splice(index, 1, {
       name: bookName,
       description: bookDisc,
       status: bookStatus
     });
-    userData[0].save();
-    res.send(userData[0].books);
+    userData[1].save();
+    res.send(userData[1].books);
   });
 }
 
